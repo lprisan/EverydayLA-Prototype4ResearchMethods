@@ -1,8 +1,8 @@
-title: Everyday Learning Analytics @ ...Event/Course... (...Date...)
+title: Everyday Learning Analytics @ Research Methods (Spring 2017)
 author: Luis P. Prieto
 email: lprisan@tlu.ee
 description: A prototype of what Everyday Learning Analytics might look like
-baseurl: /EverydayLA-Prototype4Base
+baseurl: /EverydayLA-Prototype4ResearchMethods
 
 # Build settings
 markdown: kramdown

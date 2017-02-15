@@ -1,4 +1,5 @@
 ## Goal of the session
 
-1. Every student should have the chance to communicate what the current ideas are
-2. EVery student should get input/feedback about the major open questions they have about their topic 
+1. Every student gets an individual understanding of the day's topic/method
+2. Every student has the opportunity to participate in the discussion of the day's topic/method
+3. Every student has the chance to apply the day's method to their own research proposal
