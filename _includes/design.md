@@ -26,8 +26,8 @@ Planned time: ???? mins
 ... any exercise to see how the ideas of the readings can be applied to each students' own proposal??
 
 ### 5. Wrap-up and questionnaire (this would be done ALL sessions) [3']
-* The teacher asks students to reflect (anonymously) on their learning experience today (and reflects him/herself), [using the Prolearning tool](){:target="_blank"}.
-* IMPORTANT: Remark that this is for the teacher's own understanding and the improvement of the course, and that this kind of reflection/self-assessment exercises have been shown to be very effective in increasing learning outcomes
+* The teacher asks students to reflect (anonymously) on their learning experience today (and reflects him/herself), [using the Prolearning tool](http://prolearning.realto.ch/){:target="_blank"}.
+* IMPORTANT: Clearly remark that this is for the teacher's own understanding and the improvement of the course, and that this kind of reflection/self-assessment exercises have been shown to be very effective in increasing learning outcomes
 * Example questions (others are also possible):
     * I had read fully today's assigned readings (yes/no)
     * I only skimmed through today's assigned readings (yes/no)
