@@ -14,6 +14,7 @@ Planned time: ???? mins
     * This may include multiple choice questions, as well as a few more freeform ones (to be discussed in #3)
     * Should these forms include a field with the name? (for assessment or later matching)
 * Teacher gets an overview of the responses in [a dashboard or Google Forms](){:target="_blank"}
+* (Optional) Maybe the teacher could also respond to the questions, to set the "right response" (even for the more qualitative NLP, it would be interesting to compare those with students'?)
 
 ### 3. Discussion about the readings (Pairs) **[15']**
 * Students are asked to discuss about the more nuanced/qualitative questions
