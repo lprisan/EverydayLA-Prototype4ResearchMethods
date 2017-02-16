@@ -9,21 +9,19 @@
 
 ... including interspersed questions and practical exercises about the reading of Tomsic (2006).
 
-#### Block 1
+#### **Block 1**
 
 * When appropriate, students go on to [this form](https://docs.google.com/forms/d/e/1FAIpQLSd4n-ZMaIgl3hhxkpN-96m1kxTy1IpR9d-JEXt09exroZl1MA/viewform){:target="_blank"} and answer a few questions about the reading assignment of the day
 
-NOTE: they answer the form **individually, then in pairs**, or only in pairs?
-
-#### Block 2
+#### **Block 2**
 
 * When appropriate, students go on to [this form](https://docs.google.com/forms/d/e/1FAIpQLSfdPBBS8PDCv5VK4VSohfZRm7CQi8NyjF1NzhDg_jAoSqneiQ/viewform){:target="_blank"} and answer a few questions about the reading assignment of the day
 
-#### Block 3
+#### **Block 3**
 
 * When appropriate, students go on to [this form](https://docs.google.com/forms/d/e/1FAIpQLSdCMmPgENeiIQ-s5mqNUKPSCSmG1sI1O99d2lq45Ip-e34t_g/viewform){:target="_blank"} and answer a few questions about the reading assignment of the day
 
-#### Block 4
+#### **Block 4**
 
 * When appropriate, students go on to [this form](https://docs.google.com/forms/d/e/1FAIpQLSdcdtawRoWyvXKXv74JSUctOw-HA5ssIuYlrM2Fr70HMZ8Bhw/viewform){:target="_blank"} and answer a few questions about the reading assignment of the day
 
