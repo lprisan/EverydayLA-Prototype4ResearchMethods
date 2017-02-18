@@ -26,7 +26,8 @@ library(scales)
 URL_Exp_Block1 <- 'https://docs.google.com/spreadsheets/d/1j1S60E64E0voiGaBbF3qFhM6H2QPJOBhUQPlhT0CO-A/edit?usp=sharing'
 URL_Exp_Block2 <- 'https://docs.google.com/spreadsheets/d/15wmGjILdk0NT2ELa3lD5SfHyudNELhTIxJ5OpP8n1Uc/edit?usp=sharing'
 URL_Exp_Block3 <- 'https://docs.google.com/spreadsheets/d/1wTQwxhG6knUH8B5neJ_Du3sNCr2GRQ_ie376QVWU4IE/edit?usp=sharing'
-URL_Exp_Block4 <- 'https://docs.google.com/spreadsheets/d/1AAuOnhI6nIImODoz-LSpzr72idbFlZUuFYkOX7Y27xM/edit?usp=sharing'
+URL_Exp_Block4 <- 'https://docs.google.com/spreadsheets/d/1ds9w2CZ5clYz9cuBPQrGtfjbOl4Gpe23EvnoQ2K0UGQ/edit?usp=sharing'
+URL_Exp_Block5 <- 'https://docs.google.com/spreadsheets/d/1AAuOnhI6nIImODoz-LSpzr72idbFlZUuFYkOX7Y27xM/edit?usp=sharing'
 
 
 
@@ -91,7 +92,7 @@ expB3D <- reactive({
 })
 
 expBlock4Data <- pollSpreadsheet(URL_Exp_Block4, 
-                          c("Timestamp","Name1","Name2","Company.Research","Benefits","Conflict"),
+                          c("Timestamp","Name1","Name2","Matched.Pairs","Repeated.Measures","Second.Factor"),
                           c("Name1","Name2"))
 
 expB4D <- reactive({
@@ -99,6 +100,14 @@ expB4D <- reactive({
   data
 })
 
+expBlock5Data <- pollSpreadsheet(URL_Exp_Block5, 
+                          c("Timestamp","Name1","Name2","Company.Research","Benefits","Conflict"),
+                          c("Name1","Name2"))
+
+expB5D <- reactive({
+  data <- expBlock5Data()
+  data
+})
 
 
 convertFactor <- function(values){
@@ -314,28 +323,28 @@ Block 2
 Column 1
 -------------------------------------
 
-### Experimental Design
+
+### Why is this a quasi experiment? What changes to make it experimental? (responses)
 
 
 ```{r}
 
-renderPlot({
-   data <- expB2D()
-    ind <- data[,"Design"]
-    if(length(ind)>0){
-      df <- data.frame(Responses=as.factor(ind))
-      if(nrow(df)>0){
-        
-        levels(df$Responses) <- gsub(" ", "\n", levels(df$Responses))
-        ggplot(df, aes(x=Responses, fill=Responses)) +
-  geom_bar(stat="count") +
-  scale_y_continuous(breaks=integer_breaks) +
-  guides(fill=FALSE) +
-  theme_bw() + scale_fill_brewer(palette="Set1") + theme(axis.text=element_text(size=12),
-        axis.title=element_text(size=14,face="bold"))
-      }  
-    }
+library(Hmisc)
+
+renderTable({
+ data <- expB2D()
+ q <- data[,"Quasi"]
+ if(length(q)>0){
+  resp <- unlist(string.break.line(q))
+ }else{
+   resp <- c("")
+ }
+ resp <- clean_vector(resp)
+ data.frame(Response=resp)
+ 
 })
+
+
 ```
 
 
@@ -366,27 +375,28 @@ renderPlot({
 ```
 
 
-### Why is this a quasi experiment? What changes to make it experimental? (responses)
+### Experimental Design
 
 
 ```{r}
 
-library(Hmisc)
-
-renderTable({
- data <- expB2D()
- q <- data[,"Quasi"]
- if(length(q)>0){
-  resp <- unlist(string.break.line(q))
- }else{
-   resp <- c("")
- }
- resp <- clean_vector(resp)
- data.frame(Response=resp)
- 
+renderPlot({
+   data <- expB2D()
+    ind <- data[,"Design"]
+    if(length(ind)>0){
+      df <- data.frame(Responses=as.factor(ind))
+      if(nrow(df)>0){
+        
+        levels(df$Responses) <- gsub(" ", "\n", levels(df$Responses))
+        ggplot(df, aes(x=Responses, fill=Responses)) +
+  geom_bar(stat="count") +
+  scale_y_continuous(breaks=integer_breaks) +
+  guides(fill=FALSE) +
+  theme_bw() + scale_fill_brewer(palette="Set1") + theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=14,face="bold"))
+      }  
+    }
 })
-
-
 ```
 
 
@@ -498,8 +508,165 @@ renderTable({
 ```
 
 
-
 Block 4
+=====================================  
+
+
+Column 1 
+-------------------------------------
+
+### How could authors realize a matched pairs design? (WordCloud)
+
+```{r}
+
+renderPlot({
+   data <- expB4D()
+    cr <- data[,"Matched.Pairs"]
+    if(length(cr)>0){
+      d <- unlist(string.break.line(paste(cr,sep="\n")))
+      d <- clean_vector(d)
+      if(length(d)>0){
+        corpus <- Corpus(VectorSource(d))
+        corpus <- tm_map(corpus, removePunctuation)
+        corpus <- tm_map(corpus, tolower)
+        corpus <- tm_map(corpus, removeWords, stopwords("english"))
+        corpus <- tm_map(corpus, stemDocument)
+        corpus <- tm_map(corpus, PlainTextDocument)
+        wordcloud(corpus, max.words=100, random.order=F)
+      }  
+    }
+})
+```
+
+
+### How could authors realize a matched pairs design? (Responses)
+
+
+```{r}
+
+library(Hmisc)
+
+renderTable({
+ data <- expB4D()
+ cr <- data[,"Matched.Pairs"]
+ if(length(cr)>0){
+  resp <- unlist(string.break.line(cr))
+ }else{
+   resp <- c("")
+ }
+ resp <- clean_vector(resp)
+ data.frame(Response=resp)
+ 
+})
+
+
+```
+
+
+Column 2 
+-------------------------------------
+
+### How could authors realize a repeated measures design? (WordCloud)
+
+```{r}
+
+renderPlot({
+   data <- expB4D()
+    cr <- data[,"Repeated.Measures"]
+    if(length(cr)>0){
+      d <- unlist(string.break.line(paste(cr,sep="\n")))
+      d <- clean_vector(d)
+      if(length(d)>0){
+        corpus <- Corpus(VectorSource(d))
+        corpus <- tm_map(corpus, removePunctuation)
+        corpus <- tm_map(corpus, tolower)
+        corpus <- tm_map(corpus, removeWords, stopwords("english"))
+        corpus <- tm_map(corpus, stemDocument)
+        corpus <- tm_map(corpus, PlainTextDocument)
+        wordcloud(corpus, max.words=100, random.order=F)
+      }  
+    }
+})
+```
+
+
+### How could authors realize a repeated measures design? (Responses)
+
+
+```{r}
+
+library(Hmisc)
+
+renderTable({
+ data <- expB4D()
+ cr <- data[,"Repeated.Measures"]
+ if(length(cr)>0){
+  resp <- unlist(string.break.line(cr))
+ }else{
+   resp <- c("")
+ }
+ resp <- clean_vector(resp)
+ data.frame(Response=resp)
+ 
+})
+
+
+```
+
+
+
+Column 3 
+-------------------------------------
+
+### Name one potential second experimental factor (WordCloud)
+
+```{r}
+
+renderPlot({
+   data <- expB4D()
+    cr <- data[,"Second.Factor"]
+    if(length(cr)>0){
+      d <- unlist(string.break.line(paste(cr,sep="\n")))
+      d <- clean_vector(d)
+      if(length(d)>0){
+        corpus <- Corpus(VectorSource(d))
+        corpus <- tm_map(corpus, removePunctuation)
+        corpus <- tm_map(corpus, tolower)
+        corpus <- tm_map(corpus, removeWords, stopwords("english"))
+        corpus <- tm_map(corpus, stemDocument)
+        corpus <- tm_map(corpus, PlainTextDocument)
+        wordcloud(corpus, max.words=100, random.order=F)
+      }  
+    }
+})
+```
+
+
+### Name one potential second experimental factor (Responses)
+
+
+```{r}
+
+library(Hmisc)
+
+renderTable({
+ data <- expB4D()
+ cr <- data[,"Second.Factor"]
+ if(length(cr)>0){
+  resp <- unlist(string.break.line(cr))
+ }else{
+   resp <- c("")
+ }
+ resp <- clean_vector(resp)
+ data.frame(Response=resp)
+ 
+})
+
+
+```
+
+
+Block 5
 =====================================  
 
 Column 1 
@@ -512,7 +679,7 @@ Column 1
 ```{r}
 
 renderPlot({
-   data <- expB4D()
+   data <- expB5D()
     cr <- data[,"Company.Research"]
     if(length(cr)>0){
       d <- unlist(string.break.line(paste(cr,sep="\n")))
@@ -539,7 +706,7 @@ renderPlot({
 library(Hmisc)
 
 renderTable({
- data <- expB4D()
+ data <- expB5D()
  cr <- data[,"Company.Research"]
  if(length(cr)>0){
   resp <- unlist(string.break.line(cr))
@@ -564,7 +731,7 @@ Column 2
 ```{r}
 
 renderPlot({
-   data <- expB4D()
+   data <- expB5D()
     ben <- data[,"Benefits"]
     if(length(ben)>0){
       d <- unlist(string.break.line(paste(ben,sep="\n")))
@@ -593,7 +760,7 @@ renderPlot({
 library(Hmisc)
 
 renderTable({
- data <- expB4D()
+ data <- expB5D()
  ben <- data[,"Benefits"]
  if(length(ben)>0){
   resp <- unlist(string.break.line(ben))
@@ -618,7 +785,7 @@ Column 3
 ```{r}
 
 renderPlot({
-   data <- expB4D()
+   data <- expB5D()
     conf <- data[,"Conflict"]
     if(length(conf)>0){
       d <- unlist(string.break.line(paste(conf,sep="\n")))
@@ -647,7 +814,7 @@ renderPlot({
 library(Hmisc)
 
 renderTable({
- data <- expB4D()
+ data <- expB5D()
  conf <- data[,"Conflict"]
  if(length(conf)>0){
   resp <- unlist(string.break.line(conf))
