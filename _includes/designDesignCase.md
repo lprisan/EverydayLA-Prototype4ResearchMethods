@@ -7,7 +7,7 @@
 
 ### 2. The Lecture
 
-... including interspersed questions and practical exercises about the reading of Tomsic (2006).
+... including interspersed questions and practical exercises
 
 #### **Block 1**
 
