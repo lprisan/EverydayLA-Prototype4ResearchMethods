@@ -1,0 +1,579 @@
+---
+title: "Everyday LA: Research Methods (Spring 2017) - Design research and Case studies"
+output: 
+  flexdashboard::flex_dashboard
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(gsheet)
+library(tidyr)
+suppressMessages(library(dplyr))
+library(data.table)
+library(rvest)
+library(ggplot2)
+library(ineq)
+library(syuzhet)
+library(tm)
+library(wordcloud)
+library(SnowballC)
+library(stringi)
+library(stringr)
+library(scales)
+
+
+URL_Exp_Block1 <- 'https://docs.google.com/spreadsheets/d/1hLQh5sFGBcvJjUeVscBZjcPbd8LichQI5C8_wCZz0F0/edit?usp=sharing'
+URL_Exp_Block2 <- 'https://docs.google.com/spreadsheets/d/16Pgt1_rw81-Ngq5ROGdVpXzwhrmezFvXTzY9QATjVBo/edit?usp=sharing'
+URL_Exp_Block3 <- 'https://docs.google.com/spreadsheets/d/1hUdaLkJs47Lgv3JipUQspDtGXDkZsOtt1TEbTbJeKQc/edit?usp=sharing'
+URL_Exp_Block4 <- 'https://docs.google.com/spreadsheets/d/1evf43EqXnTZpAIqHOP-kWJJl5an2IHW32nmZ3b_uHsA/edit?usp=sharing'
+
+
+
+# Define the data gathering function here? possibly using
+# http://shiny.rstudio.com/reference/shiny/latest/reactivePoll.html
+# http://shiny.rstudio.com/gallery/reactive-poll-and-file-reader.html
+
+pollSpreadsheet <- function(url, namesCol=NULL, factors=NULL){
+  data <- reactivePoll(5000, session,
+                     readLastTimestamp <- function(){
+                        # We read the latest response timestamp
+                        data <- as.data.frame(gsheet2tbl(url))
+                        if(nrow(data)>0 & ncol(data)>1){
+                          data[nrow(data),1]
+                        }else{
+                          ""
+                        }
+                      },
+                     readValue <- function(){
+                        data <- as.data.frame(gsheet2tbl(url))
+                        #We clean it up a bit
+                        if(!is.null(namesCol) & length(namesCol)>0){
+                          names(data) <- namesCol 
+                        }
+                        if(!is.null(factors) & length(factors)>0){
+                          for(f in factors){
+                            data[,f] <- as.factor(data[,f])
+                          }  
+                        }
+                        data
+                      })
+  data
+}
+
+
+expBlock1Data <- pollSpreadsheet(URL_Exp_Block1, 
+                          c("Timestamp","Name1","Name2","Understand.Design"),
+                          c("Name1","Name2"))
+
+expB1D <- reactive({
+  data <- expBlock1Data()
+  data
+})
+
+expBlock2Data <- pollSpreadsheet(URL_Exp_Block2, 
+                          c("Timestamp","Name1","Name2","Theory","Instruments","Inform","Form.Sum"),
+                          c("Name1","Name2"))
+
+expB2D <- reactive({
+  data <- expBlock2Data()
+  data
+})
+
+
+expBlock3Data <- pollSpreadsheet(URL_Exp_Block3, 
+                          c("Timestamp","Name1","Name2","Characteristics"),
+                          c("Name1","Name2"))
+
+expB3D <- reactive({
+  data <- expBlock3Data()
+  data
+})
+
+expBlock4Data <- pollSpreadsheet(URL_Exp_Block4, 
+                          c("Timestamp","Name1","Name2","Similarities","Differences"),
+                          c("Name1","Name2"))
+
+expB4D <- reactive({
+  data <- expBlock4Data()
+  data
+})
+
+
+convertFactor <- function(values){
+  print(values)
+  if(!is.null(values) & length(values)>0){
+    newvals = numeric()
+    for(val in values){
+      if(grepl(as.character(val),"Strongly agree",fixed = T)){
+        newval = 5
+      }else if(grepl(as.character(val),"Agree",fixed = T)){
+        newval = 4
+      }else if(grepl(as.character(val),"Neither agree nor disagree",fixed = T)){
+        newval = 3
+      }else if(grepl(as.character(val),"Disagree",fixed = T)){
+        newval = 2
+      }else if(grepl(as.character(val),"Strongly disagree",fixed = T)){
+        newval = 1
+      }else if(grepl(as.character(val),"Not Applicable",fixed = T)){
+        newval = NA
+      }
+      newvals <- c(newvals, newval)
+    }
+    print(newvals)
+    newvals
+  }else{
+    values
+  }
+}
+
+
+
+      count_words <- function(s){
+        #count <- as.numeric(stri_stats_latex(s)['Words'])
+        count <- vapply(strsplit(s, "\\W+"), length, integer(1))
+        count
+      }
+
+  clean_vector <- function(v){
+    newv <- v[v!=""]
+    newv2 <- newv[nchar(newv)>1]
+    newv2
+  }
+      
+integer_breaks <- function(x)
+  seq(floor(min(x)), ceiling(max(x)))
+
+#sessions <- read.csv(file = "Sessions.csv", encoding="UTF-8", stringsAsFactors=FALSE)
+
+```
+
+
+Block 1
+=====================================  
+
+Column 1 
+-------------------------------------
+
+### How do you understand design in research? (WordCloud)
+
+```{r}
+
+renderPlot({
+   data <- expB1D()
+    treat <- data[,"Understand.Design"]
+    if(length(treat)>0){
+      d <- unlist(string.break.line(paste(treat,sep="\n")))
+      d <- clean_vector(d)
+      if(length(d)>0){
+        corpus <- Corpus(VectorSource(d))
+        corpus <- tm_map(corpus, removePunctuation)
+        corpus <- tm_map(corpus, tolower)
+        corpus <- tm_map(corpus, removeWords, stopwords("english"))
+        corpus <- tm_map(corpus, stemDocument)
+        corpus <- tm_map(corpus, PlainTextDocument)
+        wordcloud(corpus, max.words=100, random.order=F)
+      }  
+    }
+})
+```
+
+
+### How do you understand design in research? (Responses)
+
+
+```{r}
+
+library(Hmisc)
+
+renderTable({
+ data <- expB1D()
+ treat <- data[,"Understand.Design"]
+ if(length(treat)>0){
+  resp <- unlist(string.break.line(treat))
+ }else{
+   resp <- c("")
+ }
+ resp <- clean_vector(resp)
+ data.frame(Response=resp)
+ 
+})
+
+
+```
+
+
+
+
+Block 2
+=====================================  
+
+Column 1
+-------------------------------------
+
+
+### What theory motivated/constrained the design? (Responses)
+
+
+```{r}
+
+library(Hmisc)
+
+renderTable({
+ data <- expB2D()
+ q <- data[,"Theory"]
+ if(length(q)>0){
+  resp <- unlist(string.break.line(q))
+ }else{
+   resp <- c("")
+ }
+ resp <- clean_vector(resp)
+ data.frame(Response=resp)
+ 
+})
+
+
+```
+
+
+### What theory motivated/constrained the design? (Wordcloud)
+
+```{r}
+
+renderPlot({
+   data <- expB2D()
+    q <- data[,"Theory"]
+    if(length(q)>0){
+      d <- unlist(string.break.line(paste(q,sep="\n")))
+      d <- clean_vector(d)
+      if(length(d)>0){
+        corpus <- Corpus(VectorSource(d))
+        corpus <- tm_map(corpus, removePunctuation)
+        corpus <- tm_map(corpus, tolower)
+        corpus <- tm_map(corpus, removeWords, stopwords("english"))
+        corpus <- tm_map(corpus, stemDocument)
+        corpus <- tm_map(corpus, PlainTextDocument)
+        wordcloud(corpus, max.words=100, random.order=F)
+      }  
+    }
+})
+```
+
+
+Column 2
+-------------------------------------
+
+
+### What kind of instruments were employed in the design cycles? (Responses)
+
+
+```{r}
+
+library(Hmisc)
+
+renderTable({
+ data <- expB2D()
+ q <- data[,"Instruments"]
+ if(length(q)>0){
+  resp <- unlist(string.break.line(q))
+ }else{
+   resp <- c("")
+ }
+ resp <- clean_vector(resp)
+ data.frame(Response=resp)
+ 
+})
+
+
+```
+
+
+### What kind of instruments were employed in the design cycles? (Wordcloud)
+
+```{r}
+
+renderPlot({
+   data <- expB2D()
+    q <- data[,"Instruments"]
+    if(length(q)>0){
+      d <- unlist(string.break.line(paste(q,sep="\n")))
+      d <- clean_vector(d)
+      if(length(d)>0){
+        corpus <- Corpus(VectorSource(d))
+        corpus <- tm_map(corpus, removePunctuation)
+        corpus <- tm_map(corpus, tolower)
+        corpus <- tm_map(corpus, removeWords, stopwords("english"))
+        corpus <- tm_map(corpus, stemDocument)
+        corpus <- tm_map(corpus, PlainTextDocument)
+        wordcloud(corpus, max.words=100, random.order=F)
+      }  
+    }
+})
+```
+
+
+Column 3
+-------------------------------------
+
+
+### How did the results inform changes in the design? (Responses)
+
+
+```{r}
+
+library(Hmisc)
+
+renderTable({
+ data <- expB2D()
+ q <- data[,"Inform"]
+ if(length(q)>0){
+  resp <- unlist(string.break.line(q))
+ }else{
+   resp <- c("")
+ }
+ resp <- clean_vector(resp)
+ data.frame(Response=resp)
+ 
+})
+
+
+```
+
+
+### How did the results inform changes in the design? (Wordcloud)
+
+```{r}
+
+renderPlot({
+   data <- expB2D()
+    q <- data[,"Inform"]
+    if(length(q)>0){
+      d <- unlist(string.break.line(paste(q,sep="\n")))
+      d <- clean_vector(d)
+      if(length(d)>0){
+        corpus <- Corpus(VectorSource(d))
+        corpus <- tm_map(corpus, removePunctuation)
+        corpus <- tm_map(corpus, tolower)
+        corpus <- tm_map(corpus, removeWords, stopwords("english"))
+        corpus <- tm_map(corpus, stemDocument)
+        corpus <- tm_map(corpus, PlainTextDocument)
+        wordcloud(corpus, max.words=100, random.order=F)
+      }  
+    }
+})
+```
+
+Column 4
+-------------------------------------
+
+
+### Where they more formative or summative? (Responses)
+
+
+```{r}
+
+library(Hmisc)
+
+renderTable({
+ data <- expB2D()
+ q <- data[,"Form.Sum"]
+ if(length(q)>0){
+  resp <- unlist(string.break.line(q))
+ }else{
+   resp <- c("")
+ }
+ resp <- clean_vector(resp)
+ data.frame(Response=resp)
+ 
+})
+
+
+```
+
+
+### Where they more formative or summative? (Wordcloud)
+
+```{r}
+
+renderPlot({
+   data <- expB2D()
+    q <- data[,"Form.Sum"]
+    if(length(q)>0){
+      d <- unlist(string.break.line(paste(q,sep="\n")))
+      d <- clean_vector(d)
+      if(length(d)>0){
+        corpus <- Corpus(VectorSource(d))
+        corpus <- tm_map(corpus, removePunctuation)
+        corpus <- tm_map(corpus, tolower)
+        corpus <- tm_map(corpus, removeWords, stopwords("english"))
+        corpus <- tm_map(corpus, stemDocument)
+        corpus <- tm_map(corpus, PlainTextDocument)
+        wordcloud(corpus, max.words=100, random.order=F)
+      }  
+    }
+})
+```
+
+
+
+Block 3
+=====================================  
+
+Column 1 
+-------------------------------------
+
+### Name 3 aspects/characteristics of case studies (WordCloud)
+
+```{r}
+
+renderPlot({
+   data <- expB3D()
+    cont <- data[,"Characteristics"]
+    if(length(cont)>0){
+      d <- unlist(string.break.line(paste(cont,sep="\n")))
+      d <- clean_vector(d)
+      if(length(d)>0){
+        corpus <- Corpus(VectorSource(d))
+        corpus <- tm_map(corpus, removePunctuation)
+        corpus <- tm_map(corpus, tolower)
+        corpus <- tm_map(corpus, removeWords, stopwords("english"))
+        corpus <- tm_map(corpus, stemDocument)
+        corpus <- tm_map(corpus, PlainTextDocument)
+        wordcloud(corpus, max.words=100, random.order=F)
+      }  
+    }
+})
+```
+
+
+### Name 3 aspects/characteristics of case studies (Responses)
+
+
+```{r}
+
+library(Hmisc)
+
+renderTable({
+ data <- expB3D()
+ cont <- data[,"Characteristics"]
+ if(length(cont)>0){
+  resp <- unlist(string.break.line(cont))
+ }else{
+   resp <- c("")
+ }
+ resp <- clean_vector(resp)
+ data.frame(Response=resp)
+ 
+})
+
+
+```
+
+
+Block 4
+=====================================  
+
+
+
+
+Column 1 
+-------------------------------------
+
+### In what way case studies are SIMILAR in comparison to design-based research (WordCloud)
+
+```{r}
+
+renderPlot({
+   data <- expB4D()
+    cont <- data[,"Similarities"]
+    if(length(cont)>0){
+      d <- unlist(string.break.line(paste(cont,sep="\n")))
+      d <- clean_vector(d)
+      if(length(d)>0){
+        corpus <- Corpus(VectorSource(d))
+        corpus <- tm_map(corpus, removePunctuation)
+        corpus <- tm_map(corpus, tolower)
+        corpus <- tm_map(corpus, removeWords, stopwords("english"))
+        corpus <- tm_map(corpus, stemDocument)
+        corpus <- tm_map(corpus, PlainTextDocument)
+        wordcloud(corpus, max.words=100, random.order=F)
+      }  
+    }
+})
+```
+
+
+### In what way case studies are SIMILAR in comparison to design-based research (Responses)
+
+
+```{r}
+
+library(Hmisc)
+
+renderTable({
+ data <- expB4D()
+ cont <- data[,"Similarities"]
+ if(length(cont)>0){
+  resp <- unlist(string.break.line(cont))
+ }else{
+   resp <- c("")
+ }
+ resp <- clean_vector(resp)
+ data.frame(Response=resp)
+ 
+})
+
+
+```
+
+
+
+Column 2 
+-------------------------------------
+
+### In what way case studies are DIFFERENT in comparison to design-based research (WordCloud)
+
+```{r}
+
+renderPlot({
+   data <- expB4D()
+    cont <- data[,"Differences"]
+    if(length(cont)>0){
+      d <- unlist(string.break.line(paste(cont,sep="\n")))
+      d <- clean_vector(d)
+      if(length(d)>0){
+        corpus <- Corpus(VectorSource(d))
+        corpus <- tm_map(corpus, removePunctuation)
+        corpus <- tm_map(corpus, tolower)
+        corpus <- tm_map(corpus, removeWords, stopwords("english"))
+        corpus <- tm_map(corpus, stemDocument)
+        corpus <- tm_map(corpus, PlainTextDocument)
+        wordcloud(corpus, max.words=100, random.order=F)
+      }  
+    }
+})
+```
+
+
+### In what way case studies are DIFFERENT in comparison to design-based research (Responses)
+
+
+```{r}
+
+library(Hmisc)
+
+renderTable({
+ data <- expB4D()
+ cont <- data[,"Differences"]
+ if(length(cont)>0){
+  resp <- unlist(string.break.line(cont))
+ }else{
+   resp <- c("")
+ }
+ resp <- clean_vector(resp)
+ data.frame(Response=resp)
+ 
+})
+
+
+```
