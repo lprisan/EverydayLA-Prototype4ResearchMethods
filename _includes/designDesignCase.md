@@ -11,19 +11,19 @@
 
 #### **Block 1**
 
-* When appropriate, students go on to [this form](){:target="_blank"} and answer a few questions about the reading assignment of the day
+* When appropriate, students go on to [this form](https://docs.google.com/forms/d/e/1FAIpQLScS7OBanOLSdf40TcmbiF0bfu7fD0e7fFx6jz8LKrrQknE1Ow/viewform){:target="_blank"} and answer a few questions
 
 #### **Block 2**
 
-* When appropriate, students go on to [this form](){:target="_blank"} and answer a few questions about the reading assignment of the day
+* When appropriate, students go on to [this form](https://docs.google.com/forms/d/e/1FAIpQLSfaqRbWBA51ezg0S8X7EqWaIytedE0FdjkwmJNoshIUPpEMOw/viewform){:target="_blank"} and answer a few questions about the reading assignment of the day
 
 #### **Block 3**
 
-* When appropriate, students go on to [this form](){:target="_blank"} and answer a few questions about the reading assignment of the day
+* When appropriate, students go on to [this form](https://docs.google.com/forms/d/e/1FAIpQLSfMrHPGWgTdmeUpnoQoJ8hYMVEtfgFIccKzHAPXm0-x2jL3yg/viewform){:target="_blank"} and answer a few questions
 
 #### **Block 4**
 
-* When appropriate, students go on to [this form](){:target="_blank"} and answer a few questions about the reading assignment of the day
+* When appropriate, students go on to [this form](https://docs.google.com/forms/d/e/1FAIpQLSesBJJZk1B3DCs2pOl2VAfedtOz8Qis4ePiNB_j2743QLZzEw/viewform){:target="_blank"} and answer a few questions
 
 
 ### 3. Wrap-up and questionnaire
